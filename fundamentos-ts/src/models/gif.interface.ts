@@ -8,5 +8,6 @@ export interface Gif {
     url: string;
     username?: string;
     tags: string[];
+    description?: string;
     rating: GifRating;
 }
