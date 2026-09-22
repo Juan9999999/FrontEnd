@@ -33,4 +33,11 @@ export const gifs: Gif[] = [
         tags: ['idea', 'creatividad', 'solución'],
         rating: 'g',
     },
+    {
+        id: 'idea-04',
+        title: 'XD',
+        url: `${MEDIA_URL}/XsBCf8njDBmKvjZv2G/giphy.gif`,
+        tags: ['flame', 'creatividad', 'solución'],
+        rating: 'g',
+    },
 ];
