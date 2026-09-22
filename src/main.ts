@@ -1,10 +1,13 @@
 import './style.css';
-import { gifs } from './data/gifs';
+import type { Gif } from './models/gif.interface';
 import { clearGifDetail, renderGifDetail } from './components/gif-detail';
 import { renderGallery } from './components/gallery';
 import { renderStatus } from './components/status';
 import { RequestStatus } from './models/request-status.enum';
-import { findGifById, searchGifs } from './services/gif.service';
+import { getTrendingGifs, searchGifsFromApi } from './services/gif.service';
+
+// Variable de estado para almacenar los datos que llegan de internet
+let currentGifs: Gif[] = [];
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
@@ -15,9 +18,9 @@ if (!app) {
 app.innerHTML = `
   <main class="app-shell">
     <header class="hero">
-      <p class="eyebrow">EC1 - Organización modular</p>
+      <p class="eyebrow">EC1 - Consumo de GIPHY API</p>
       <h1>GIFinder</h1>
-      <p>Explora una colección local de GIFs.</p>
+      <p>Explora contenido real desde internet.</p>
     </header>
     
     <form id="search-form" class="search-form">
@@ -39,6 +42,10 @@ app.innerHTML = `
     <section id="gif-gallery" class="gallery" aria-label="Resultados"></section>
     
     <aside id="gif-detail" class="gif-detail-container" aria-live="polite"></aside>
+
+    <footer class="giphy-attribution">
+        <img src="/powered-by-giphy.png" alt="Powered by GIPHY" />
+    </footer>
   </main>
 `;
 
@@ -52,21 +59,52 @@ if (!form || !input || !gallery || !status || !detailContainer) {
   throw new Error('No se pudo inicializar la interfaz.');
 }
 
-form.addEventListener('submit', (event: SubmitEvent) => {
-  event.preventDefault();
-  
-  renderStatus(RequestStatus.Loading, status);
-  const results = searchGifs(gifs, input.value);
-  
-  renderGallery(results, gallery);
+// Funciones de apoyo para manejar la UI
+const showResults = (results: Gif[])=> {
+  currentGifs = results;
+  renderGallery(currentGifs, gallery);
   clearGifDetail(detailContainer);
   
-  if (results.length === 0) {
+  if (currentGifs.length === 0) {
     renderStatus(RequestStatus.Empty, status);
-    return;
+  } else {
+    renderStatus(RequestStatus.Success, status, currentGifs.length);
   }
+}
+
+const showRequestError = (error: unknown) => {
+  console.error(error);
+  currentGifs = [];
+  renderGallery(currentGifs, gallery);
+  clearGifDetail(detailContainer);
+  renderStatus(RequestStatus.Error, status);
+}
+
+// Función de carga inicial asíncrona
+const loadTrending = async () => {
+  try {
+    renderStatus(RequestStatus.Loading, status);
+    const trending = await getTrendingGifs();
+    showResults(trending);
+  } catch (error) {
+    showRequestError(error);
+  }
+}
+
+// Formulario asíncrono
+form.addEventListener('submit', async (event: SubmitEvent) => {
+  event.preventDefault();
+  const query = input.value.trim();
   
-  renderStatus(RequestStatus.Success, status, results.length);
+  if (!query) return;
+  
+  try {
+    renderStatus(RequestStatus.Loading, status);
+    const results = await searchGifsFromApi(query);
+    showResults(results);
+  } catch (error) {
+    showRequestError(error);
+  }
 });
 
 input.addEventListener('input', () => {
@@ -74,9 +112,7 @@ input.addEventListener('input', () => {
     return;
   }
   
-  renderGallery(gifs, gallery);
-  clearGifDetail(detailContainer);
-  renderStatus(RequestStatus.Initial, status, gifs.length);
+  loadTrending();
 });
 
 gallery.addEventListener('click', (event) => {
@@ -97,7 +133,8 @@ gallery.addEventListener('click', (event) => {
     return;
   }
   
-  const selectedGif = findGifById(gifs, gifId);
+  // Buscar en la variable global dinámica en lugar del archivo local estático
+  const selectedGif = currentGifs.find(gif => gif.id === gifId);
   if (!selectedGif) {
     renderStatus(RequestStatus.Error, status);
     return;
@@ -122,5 +159,4 @@ detailContainer.addEventListener('click', (event) => {
 });
 
 // Inicialización de la vista
-renderGallery(gifs, gallery);
-renderStatus(RequestStatus.Initial, status, gifs.length);
+loadTrending();

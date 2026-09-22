@@ -1,0 +1,27 @@
+# Reflexión — EC1 F3 A4
+**Nombre:** Juan Manuel Oseguera Mendoza  
+**Grupo:** 01  
+
+# 1. ¿Cuál es la diferencia entre una ejecución síncrona y una asíncrona?
+**Respuesta:** En la ejecución síncrona, cada instrucción bloquea el programa hasta que termina para poder pasar a la siguiente instrucción. En la ejecución asíncrona, el programa inicia una tarea que toma tiempo (como solicitar datos a la API de GIPHY) y continúa ejecutando otras operaciones de la interfaz sin congelar la pantalla mientras espera la respuesta.
+
+# 2. ¿Cuáles son los tres estados posibles de una Promesa?
+**Respuesta:** 
+- **Pending (Pendiente):** La solicitud está en proceso y todavía no hay datos.
+- **Fulfilled (Cumplida):** La operación terminó correctamente y se obtuvo el resultado esperado.
+- **Rejected (Rechazada):** La operación falló (por ejemplo, por falta de internet) y devuelve un error.
+
+# 3. ¿Por qué es necesario comprobar `response.ok` al utilizar Fetch API?
+**Respuesta:** Porque la función `fetch` no rechaza automáticamente la promesa si el servidor de GIPHY devuelve un error HTTP como 404 (No encontrado) o 401 (No autorizado). Solo la rechaza si hay un fallo total de red. Revisar `response.ok` asegura que el código de estado de la respuesta esté en el rango de éxito (200-299) antes de intentar procesar el JSON.
+
+# 4. ¿Qué ventaja aporta el uso de `async` y `await` para el manejo de promesas?
+**Respuesta:** Permite escribir y estructurar el código asíncrono de una manera que se lee como si fuera código secuencial tradicional. Esto evita el anidamiento excesivo de métodos `.then()` y facilita enormemente la lectura, el mantenimiento y la captura de errores mediante bloques `try/catch`.
+
+# 5. ¿Por qué se implementó un modelo externo (`GiphyGif`) y uno interno (`Gif`)?
+**Respuesta:** Para proteger la arquitectura de la aplicación. GIPHY devuelve un objeto JSON muy extenso con múltiples versiones de imágenes y datos que el proyecto no necesita. El modelo `GiphyGif` tipa lo que se recibe de la red, y el servicio lo transforma (mapea) al modelo `Gif`, asegurando que la interfaz gráfica solo trabaje con datos limpios, controlados y estrictos.
+
+# 6. ¿Por qué la clave de la API se configura en `.env.local` y se protege con `.gitignore`?
+**Respuesta:** Para separar la configuración sensible del código fuente. Al agregar el archivo a `.gitignore`, se evita que la clave privada se suba por accidente al repositorio público, previniendo que terceros hagan un mal uso de la cuota de peticiones asignada a esa API Key.
+
+# 7. ¿Para qué se utilizan los bloques `try` y `catch` en las peticiones de red?
+**Respuesta:** El bloque `try` encapsula el código que depende de servicios externos y que es propenso a fallar. Si ocurre cualquier interrupción (caída de servidor, error de tipeo en la URL, pérdida de conexión), la ejecución salta inmediatamente al bloque `catch`. Esto permite capturar el error y mostrar un mensaje amigable en la interfaz en lugar de que la aplicación colapse por completo.

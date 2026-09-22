@@ -1,34 +1,54 @@
-import type { Gif } from '../models/gif.interface';
+import type { Gif, GifRating } from '../models/gif.interface';
+import type { GiphyResponse, GiphyGif } from '../models/giphy-response.interface';
 
-import { normalizeText } from '../utils/text';
+// Lee la variable de entorno que configuraste en tu .env.local
+const API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
+const BASE_URL = 'https://api.giphy.com/v1/gifs';
 
-function matchesQuery(
-    gif: Gif,
-    query: string,
-): boolean {
-    const searchableText = [
-        gif.title,
-        gif.username ?? '',
-        ...gif.tags,
-    ].join(' ');
-    return normalizeText(searchableText)
-        .includes(query);
+// Función para transformar el modelo externo de Giphy al modelo interno de GIFinder
+function mapGiphyGif(giphyGif: GiphyGif): Gif {
+    return {
+        id: giphyGif.id,
+        title: giphyGif.title || 'GIF sin título',
+        url: giphyGif.images.fixed_height.url, // Imagen ligera para la galería
+        detailUrl: giphyGif.images.original.url, // Imagen pesada para el detalle
+        username: giphyGif.username || 'Autor desconocido',
+        tags: [], // Giphy no devuelve tags en este endpoint por defecto
+        rating: (giphyGif.rating || 'g') as GifRating,
+        altText: giphyGif.alt_text || 'Animación GIF',
+    };
 }
-export function searchGifs(
-    collection: Gif[],
-    value: string,
-): Gif[] {
-    const query = normalizeText(value);
-    if (!query) {
-        return [...collection];
+
+// Función asíncrona para obtener las tendencias (Carga inicial)
+export async function getTrendingGifs(): Promise<Gif[]> {
+    const url = `${BASE_URL}/trending?api_key=${API_KEY}&limit=20&rating=g`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Error en la petición HTTP: ${response.status}`);
     }
-    return collection.filter((gif) =>
-        matchesQuery(gif, query),
-    );
+
+    const json = (await response.json()) as GiphyResponse;
+    return json.data.map(mapGiphyGif);
 }
-export function findGifById(
-    collection: Gif[],
-    id: string,
-): Gif | undefined {
-    return collection.find((gif) => gif.id === id);
+
+// Función asíncrona para buscar GIFs (Cuando el usuario usa el formulario)
+export async function searchGifsFromApi(query: string): Promise<Gif[]> {
+    if (!query.trim()) return [];
+
+    const params = new URLSearchParams({
+        api_key: API_KEY,
+        q: query,
+        limit: '20',
+        rating: 'g',
+        lang: 'es'
+    });
+
+    const response = await fetch(`${BASE_URL}/search?${params.toString()}`);
+    if (!response.ok) {
+        throw new Error(`Error en la búsqueda HTTP: ${response.status}`);
+    }
+
+    const json = (await response.json()) as GiphyResponse;
+    return json.data.map(mapGiphyGif);
 }

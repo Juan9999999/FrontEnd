@@ -10,4 +10,6 @@ export interface Gif {
     tags: string[];
     description?: string;
     rating: GifRating;
+    detailUrl?: string; // NUEVO
+    altText?: string;   // NUEVO
 }
