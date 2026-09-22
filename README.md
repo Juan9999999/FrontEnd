@@ -53,42 +53,42 @@ La recursividad es un concepto de programación donde una función **se llama a 
   # Preguntas de cierre - EC1 F2 A3
 
 ## 1. ¿Qué significa refactorizar una aplicación?
-Refactorizar significa mejorar la organización interna del código sin cambiar innecesariamente su comportamiento observable [cite: 21].
+Refactorizar significa mejorar la organización interna del código sin cambiar innecesariamente su comportamiento observable.
 
 ## 2. ¿Por qué el proyecto se dividió en módulos?
-El proyecto se dividió en módulos para distribuir el código asignándole responsabilidades específicas [cite: 11] y claras [cite: 23], tales como separar los modelos, los datos locales, los servicios de búsqueda y los componentes de la interfaz [cite: 708-713].
+El proyecto se dividió en módulos para distribuir el código asignándole responsabilidades específicas y claras, tales como separar los modelos, los datos locales, los servicios de búsqueda y los componentes de la interfaz.
 
 ## 3. ¿Cuál es la responsabilidad de main.ts?
-La responsabilidad principal de `main.ts` es inicializar la interfaz y coordinar los módulos [cite: 76]. Específicamente, construye la estructura principal, valida el DOM, registra los eventos [cite: 420] e importa los módulos necesarios sin repetir las funciones que ya fueron delegadas [cite: 635, 749].
+La responsabilidad principal de `main.ts` es inicializar la interfaz y coordinar los módulos. Específicamente, construye la estructura principal, valida el DOM, registra los eventos e importa los módulos necesarios sin repetir las funciones que ya fueron delegadas.
 
 ## 4. ¿Qué diferencias existen entre una interfaz, un tipo unión y una enumeración?
 De acuerdo con el documento:
-* **Interfaz:** Define el contrato o la estructura de un objeto, como en el caso del modelo `Gif` [cite: 105, 110-117].
-* **Tipo unión:** Limita una propiedad a valores permitidos específicos, como se observa en `GifRating = 'g' | 'pg' | 'pg-13'` [cite: 109, 118].
-* **Enumeración:** Agrupa valores relacionados bajo un nombre común para representar estados (como `RequestStatus`), evitando el uso de cadenas de texto dispersas [cite: 293, 297-305].
+* **Interfaz:** Define el contrato o la estructura de un objeto, como en el caso del modelo `Gif`.
+* **Tipo unión:** Limita una propiedad a valores permitidos específicos, como se observa en `GifRating = 'g' | 'pg' | 'pg-13'`.
+* **Enumeración:** Agrupa valores relacionados bajo un nombre común para representar estados (como `RequestStatus`), evitando el uso de cadenas de texto dispersas.
 
 ## 5. ¿Para qué se utiliza import type?
-`import type` se utiliza para comunicar al compilador que lo que se está importando (por ejemplo, el modelo `Gif`) solo se utilizará durante la comprobación de tipos [cite: 158].
+`import type` se utiliza para comunicar al compilador que lo que se está importando (por ejemplo, el modelo `Gif`) solo se utilizará durante la comprobación de tipos.
 
 ## 6. ¿Dónde se aplicaron la desestructuración, spread y rest?
-* **Desestructuración:** Se aplicó sobre objetos para extraer propiedades (como `id`, `title`, `url`) al crear tarjetas y detalles, evitando repetir expresiones como `gif.title` [cite: 233-240, 273, 370]. También se usó sobre arreglos para extraer `mainTag` [cite: 371-372, 414].
-* **Spread (`...`):** Se utilizó `...gif.tags` para incorporar las etiquetas al texto de búsqueda [cite: 191, 218] y `[...collection]` para crear una copia superficial del arreglo de datos [cite: 204, 219].
-* **Rest:** Se empleó como `...secondaryTags` al aplicar desestructuración sobre el arreglo de etiquetas [cite: 373-374, 414].
+* **Desestructuración:** Se aplicó sobre objetos para extraer propiedades (como `id`, `title`, `url`) al crear tarjetas y detalles, evitando repetir expresiones como `gif.title`. También se usó sobre arreglos para extraer `mainTag`.
+* **Spread (`...`):** Se utilizó `...gif.tags` para incorporar las etiquetas al texto de búsqueda y `[...collection]` para crear una copia superficial del arreglo de datos.
+* **Rest:** Se empleó como `...secondaryTags` al aplicar desestructuración sobre el arreglo de etiquetas.
 
 ## 7. ¿Por qué searchGifs recibe la colección como parámetro?
-Recibe la colección como parámetro porque el servicio (`gif.service.ts`) tiene la responsabilidad exclusiva de ejecutar búsquedas y consultas sobre los datos [cite: 75, 195-196], mientras que la acción de solicitar los resultados pasándole la colección local ocurre de forma coordinada desde `main.ts` [cite: 534-538, 638].
+Recibe la colección como parámetro porque el servicio (`gif.service.ts`) tiene la responsabilidad exclusiva de ejecutar búsquedas y consultas sobre los datos, mientras que la acción de solicitar los resultados pasándole la colección local ocurre de forma coordinada desde `main.ts`.
 
 ## 8. ¿Por qué findGifById puede devolver undefined?
-Puede devolver `undefined` porque utiliza el método `find`, el cual devuelve el primer GIF coincidente o `undefined` en caso de no encontrar ninguno [cite: 220]. Este retorno tipado obliga al desarrollador a validar el resultado antes de usarlo [cite: 220].
+Puede devolver `undefined` porque utiliza el método `find`, el cual devuelve el primer GIF coincidente o `undefined` en caso de no encontrar ninguno. Este retorno tipado obliga al desarrollador a validar el resultado antes de usarlo.
 
 ## 9. ¿Qué función cumple data-gif-id?
-El atributo `data-gif-id` cumple la función de almacenar el identificador del GIF, el cual se utilizará más adelante al momento de seleccionar una tarjeta [cite: 274].
+El atributo `data-gif-id` cumple la función de almacenar el identificador del GIF, el cual se utilizará más adelante al momento de seleccionar una tarjeta.
 
 ## 10. ¿Qué es la delegación de eventos?
-La delegación de eventos es una técnica que permite identificar el elemento interactuado (por ejemplo, un botón seleccionado) sobre contenido que se genera dinámicamente [cite: 30, 640].
+La delegación de eventos es una técnica que permite identificar el elemento interactuado (por ejemplo, un botón seleccionado) sobre contenido que se genera dinámicamente.
 
 ## 11. ¿Por qué el estado Loading podría no observarse?
-El estado `Loading` podría no observarse debido a que la búsqueda actual utiliza datos locales y se ejecuta de manera casi instantánea [cite: 358]. El proceso suele terminar antes de que el navegador alcance a actualizar visualmente la pantalla [cite: 690-691].
+El estado `Loading` podría no observarse debido a que la búsqueda actual utiliza datos locales y se ejecuta de manera casi instantánea. El proceso suele terminar antes de que el navegador alcance a actualizar visualmente la pantalla.
 
 ## 12. ¿Qué dificultad se presentó durante la refactorización y cómo se resolvió?
 Al inicio nomas por que la terminal que tenia era antiguia y no me dejaba hacer un `pnpm build` pero de ahi estuvo bien las indicaciones.
